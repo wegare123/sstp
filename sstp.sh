@@ -15,8 +15,8 @@ read -p "(default tools: 2) : " tools
 [ -z "${tools}" ] && tools="2"
 if [ "$tools" = "1" ]; then
 
-echo "Masukkan host/ip" 
-read -p "default host/ip: $host2 : " host
+echo "Masukkan bug.com.host:port" 
+read -p "default bug.com.host:port: $host2 : " host
 [ -z "${host}" ] && host="$host2"
 
 echo "Masukkan username" 
