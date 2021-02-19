@@ -46,12 +46,19 @@ user="$(cat /root/akun/sstp.txt | tr '\n' ' '  | awk '{print $2}')"
 pass="$(cat /root/akun/sstp.txt | tr '\n' ' '  | awk '{print $3}')" 
 route="$(cat /root/akun/ipmodem.txt | grep -i ipmodem | cut -d= -f2 | tail -n1)"
 sleep 1
-sstpc --cert-warn --password $pass --user $user --log-level 5 --log-stderr --save-server-route --tls-ext $host require-mschap-v2 refuse-chap refuse-pap noauth nodeflate &
+sstpc --cert-warn --password $pass --user $user --save-server-route --tls-ext $host require-mschap-v2 refuse-chap refuse-pap noauth nodeflate &
+echo "is connecting to the internet"
 sleep 10
 pp="$(route -n | grep ppp | head -n1 | awk '{print $8}')" 
 inet="$(ip r | grep $pp | head -n1 | awk '{print $9}')" 
 route add default gw $inet metric 0 2>/dev/null
 iptables -A POSTROUTING --proto tcp -t nat -o $pp -j MASQUERADE 2>/dev/null
+konek=$(ip r | grep $pp | head -n1 | awk '{print $5}')
+if [ $pp = $konek ];then
+echo "connected"
+else
+echo "failed to connect"
+fi
 sleep 1
 fping -l google.com > /dev/null 2>&1 &
 elif [ "${tools}" = "3" ]; then
