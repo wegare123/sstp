@@ -54,10 +54,10 @@ inet="$(ip r | grep $pp | head -n1 | awk '{print $9}')"
 route add default gw $inet metric 0 2>/dev/null
 iptables -A POSTROUTING --proto tcp -t nat -o $pp -j MASQUERADE 2>/dev/null
 konek=$(ip r | grep $pp | head -n1 | awk '{print $5}')
-if [ $pp = $konek ];then
-echo "connected"
-else
+if [[ -z $konek ]]; then
 echo "failed to connect"
+else
+echo "connected"
 fi
 sleep 1
 fping -l google.com > /dev/null 2>&1 &
