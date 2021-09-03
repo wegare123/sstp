@@ -1,9 +1,18 @@
 #!/bin/bash
 #sstp (Wegare)
-clear
+stop () {
+host="$(cat /root/akun/sstp.txt | tr '\n' ' '  | awk '{print $1}')" 
+route="$(cat /root/akun/ipmodem.txt | grep -i ipmodem | cut -d= -f2 | tail -n1)" 
+bles="$(iptables -t nat -v -L POSTROUTING -n --line-number | grep ppp | head -n1 | awk '{print $1}')" 
+killall -q sstpc fping
+route del "$host" gw "$route" metric 0 2>/dev/null
+iptables -t nat -D POSTROUTING $bles 2>/dev/null
+/etc/init.d/dnsmasq restart 2>/dev/null
+}
 host2="$(cat /root/akun/sstp.txt | tr '\n' ' '  | awk '{print $1}')" 
 user2="$(cat /root/akun/sstp.txt | tr '\n' ' '  | awk '{print $2}')" 
 pass2="$(cat /root/akun/sstp.txt | tr '\n' ' '  | awk '{print $3}')" 
+clear
 echo "Inject sstp by wegare"
 echo "1. Sett Profile"
 echo "2. Start Inject"
@@ -39,6 +48,7 @@ sleep 2
 clear
 /usr/bin/sstp
 elif [ "${tools}" = "2" ]; then
+stop
 ipmodem="$(route -n | grep -i 0.0.0.0 | head -n1 | awk '{print $2}')" 
 echo "ipmodem=$ipmodem" > /root/akun/ipmodem.txt
 host="$(cat /root/akun/sstp.txt | tr '\n' ' '  | awk '{print $1}')" 
@@ -62,15 +72,7 @@ fi
 sleep 1
 fping -l google.com > /dev/null 2>&1 &
 elif [ "${tools}" = "3" ]; then
-host="$(cat /root/akun/sstp.txt | tr '\n' ' '  | awk '{print $1}')" 
-route="$(cat /root/akun/ipmodem.txt | grep -i ipmodem | cut -d= -f2 | tail -n1)" 
-bles="$(iptables -t nat -v -L POSTROUTING -n --line-number | grep ppp | head -n1 | awk '{print $1}')" 
-killall -q sstpc fping
-route del "$host" gw "$route" metric 0 2>/dev/null
-iptables -t nat -D POSTROUTING $bles 2>/dev/null
-killall dnsmasq 
-/etc/init.d/dnsmasq start > /dev/null
-sleep 2
+stop
 echo "Stop Suksess"
 sleep 2
 clear
