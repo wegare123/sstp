@@ -48,6 +48,11 @@ sleep 2
 clear
 /usr/bin/sstp
 elif [ "${tools}" = "2" ]; then
+cek="$(cat /root/akun/sstp.txt)"
+if [[ -z $cek ]]; then
+echo "anda belum membuat profile"
+exit
+fi
 stop
 ipmodem="$(route -n | grep -i 0.0.0.0 | head -n1 | awk '{print $2}')" 
 echo "ipmodem=$ipmodem" > /root/akun/ipmodem.txt
